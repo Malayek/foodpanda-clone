@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>FoodPanda Clone - Online Food Delivery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --primary: #d8232a; /* Foodpanda-ish red */
+      --primary-dark: #b01b20;
+      --bg: #f7f7f7;
+      --text: #222;
+      --muted: #666;
+      --card-bg: #fff;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --border: #ddd;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    /* Layout */
+    header {
+      background: var(--primary);
+      color: #fff;
+      padding: 12px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand {
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 0.3px;
+    }
+    .nav {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .nav button {
+      background: rgba(255,255,255,0.15);
+      border: none;
+      color: #fff;
+      padding: 6px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .nav button:hover { background: rgba(255,255,255,0.25); }
+
+    main {
+      max-width: 1100px;
+      margin: 16px auto 40px;
+      padding: 0 16px;
+    }
+
+    .section {
+      background: var(--card-bg);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .section h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.2rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+    .card img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      background: #eee;
+    }
+    .card-body {
+      padding: 10px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .card-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+    .card-sub {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .card-actions {
+      margin-top: auto;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-outline {
+      background: #fff;
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { background: #f5f5f5; }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+    .filters select, .filters input {
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: #fff;
+      font-size: 0.9rem;
+    }
+
+    .form-group {
+      margin-bottom: 10px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .col { flex: 1; min-width: 220px; }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      background: #eee;
+      color: #333;
+    }
+    .badge-success { background: #e6f4ea; color: #1e7e34; }
+    .badge-warning { background: #fff8e1; color: #9a6b00; }
+    .badge-danger { background: #fde8e9; color: #b01b20; }
+
+    .cart-bar {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 9;
+    }
+    .cart-bar .cart-info {
+      font-size: 0.9rem;
+    }
+    .cart-bar .cart-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .hidden { display: none !important; }
+
+    .order-timeline {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 0.85rem;
+    }
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #f0f0f0;
+    }
+    .step.active {
+      background: #e8f5e9;
+      color: #1e7e34;
+    }
+
+    .offer-banner {
+      background: linear-gradient(90deg, #ffeaea, #fff);
+      border: 1px solid #f5c6c8;
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: 600px) {
+      .header-inner { flex-direction: column; align-items: stretch; }
+      .nav { justify-content: center; }
+      .grid { grid-template-columns: 1fr 1fr; }
+      .cart-bar { flex-direction: column; align-items: stretch; }
+      .cart-bar .cart-actions { justify-content: space-between; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div class="brand">🍔 FoodPanda Clone</div>
+      <nav class="nav" id="navAuth">
+        <!-- Auth buttons injected by JS -->
+      </nav>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Views will be injected here -->
+  </main>
+
+  <div id="cartBar" class="cart-bar hidden">
+    <div class="cart-info" id="cartInfo">Cart: 0 items – Rs 0</div>
+    <div class="cart-actions">
+      <button class="btn btn-outline" id="btnViewCart">View Cart</button>
+      <button class="btn btn-primary" id="btnCheckout">Checkout</button>
+    </div>
+  </div>
+
+  <script>
+    // =========================
+    // Data & State
+    // =========================
+    const STORAGE_KEYS = {
+      users: 'fp_users',
+      currentUser: 'fp_currentUser',
+      restaurants: 'fp_restaurants',
+      menus: 'fp_menus',
+      orders: 'fp_orders',
+      cart: 'fp_cart'
+    };
+
+    let state = {
+      currentUser: null,
+      cart: [],
+      orders: [],
+      restaurants: [],
+      menus: {}, // restaurantId -> [items]
+      view: 'home' // home, auth, restaurants, restaurantDetail, cart, checkout, profile, orders, orderDetail
+    };
+
+    // =========================
+    // Utilities
+    // =========================
+    function $(sel) { return document.querySelector(sel); }
+    function $$(sel) { return document.querySelectorAll(sel); }
+
+    function save(key, val) {
+      localStorage.setItem(key, JSON.stringify(val));
+    }
+    function load(key, fallback = null) {
+      try {
+        const v = localStorage.getItem(key);
+        return v ? JSON.parse(v) : fallback;
+      } catch {
+        return fallback;
+      }
+    }
+
+    function uid() {
+      return Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function formatPrice(n) {
+      return 'Rs ' + Number(n).toFixed(0);
+    }
+
+    function setView(viewName) {
+      state.view = viewName;
+      render();
+    }
+
+    function ensureAuth() {
+      if (!state.currentUser) {
+        setView('auth');
+        return false;
+      }
+      return true;
+    }
+
+    // =========================
+    // Seed Data (if empty)
+    // =========================
+    function seedData() {
+      if (!load(STORAGE_KEYS.restaurants)) {
+        const restaurants = [
+          {
+            id: uid(),
+            name: "Burger Hub",
+            cuisine: "Fast Food",
+            rating: 4.5,
+            location: "Gulberg, Lahore",
+            image: "https://picsum.photos/seed/burger/400/200",
+            deliveryTime: "25–35 min"
+          },
+          {
+            id: uid(),
+            name: "Pizza Palace",
+            cuisine: "Italian",
+            rating: 4.2,
+            location: "DHA, Lahore",
+            image: "https://picsum.photos/seed/pizza/400/200",
+            deliveryTime: "30–40 min"
+          },
+          {
+            id: uid(),
+            name: "Biryani Kings",
+            cuisine: "Pakistani",
+            rating: 4.7,
+            location: "Model Town, Lahore",
+            image: "https://picsum.photos/seed/biryani/400/200",
+            deliveryTime: "20–30 min"
+          },
+          {
+            id: uid(),
+            name: "Sushi Zen",
+            cuisine: "Japanese",
+            rating: 4.3,
+            location: "Johar Town, Lahore",
+            image: "https://picsum.photos/seed/sushi/400/200",
+            deliveryTime: "35–45 min"
+          },
+          {
+            id: uid(),
+            name: "Tandoor & Co",
+            cuisine: "Pakistani",
+            rating: 4.6,
+            location: "Gulshan-e-Iqbal, Lahore",
+            image: "https://picsum.photos/seed/tandoor/400/200",
+            deliveryTime: "25–35 min"
+          },
+          {
+            id: uid(),
+            name: "Café Mocha",
+            cuisine: "Café",
+            rating: 4.1,
+            location: "MM Alam, Lahore",
+            image: "https://picsum.photos/seed/cafe/400/200",
+            deliveryTime: "15–25 min"
+          }
+        ];
+        save(STORAGE_KEYS.restaurants, restaurants);
+        state.restaurants = restaurants;
+
+        const menus = {};
+        restaurants.forEach(r => {
+          const items = [];
+          if (r.cuisine === "Fast Food") {
+            items.push(
+              { id: uid(), name: "Classic Burger", price: 350, desc: "Beef patty with cheese and veggies" },
+              { id: uid(), name: "Chicken Zinger", price: 420, desc: "Crispy chicken burger" },
+              { id: uid(), name: "Fries Large", price: 220, desc: "Salted french fries" }
+            );
+          } else if (r.cuisine === "Italian") {
+            items.push(
+              { id: uid(), name: "Margherita Pizza", price: 950, desc: "Tomato, mozzarella, basil" },
+              { id: uid(), name: "Pepperoni Pizza", price: 1150, desc: "Spicy pepperoni slices" },
+              { id: uid(), name: "Garlic Bread", price: 320, desc: "Toasted with garlic butter" }
+            );
+          } else if (r.cuisine === "Pakistani") {
+            items.push(
+              { id: uid(), name: "Chicken Biryani", price: 480, desc: "Spicy rice with chicken" },
+              { id: uid(), name: "Beef Biryani", price: 560, desc: "Rich beef biryani" },
+              { id: uid(), name: "Chicken Tikka", price: 390, desc: "Grilled chicken pieces" }
+            );
+          } else if (r.cuisine === "Japanese") {
+            items.push(
+              { id: uid(), name: "Salmon Sushi (6 pcs)", price: 1200, desc: "Fresh salmon nigiri" },
+              { id: uid(), name: "Chicken Ramen", price: 950, desc: "Noodles in savory broth" },
+              { id: uid(), name: "Tempura Platter", price: 880, desc: "Crispy fried veggies" }
+            );
+          } else if (r.cuisine === "Café") {
+            items.push(
+              { id: uid(), name: "Club Sandwich", price: 420, desc: "Triple layer sandwich" },
+              { id: uid(), name: "Iced Coffee", price: 290, desc: "Chilled coffee with cream" },
+              { id: uid(), name: "Chocolate Cake", price: 350, desc: "Rich chocolate slice" }
+            );
+          }
+          menus[r.id] = items;
+        });
+        save(STORAGE_KEYS.menus, menus);
+        state.menus = menus;
+      } else {
+        state.restaurants = load(STORAGE_KEYS.restaurants);
+        state.menus = load(STORAGE_KEYS.menus) || {};
+      }
+
+      if (!load(STORAGE_KEYS.orders)) {
+        save(STORAGE_KEYS.orders, []);
+      }
+      state.orders = load(STORAGE_KEYS.orders);
+
+      const storedCart = load(STORAGE_KEYS.cart);
+      state.cart = storedCart || [];
+
+      const storedUser = load(STORAGE_KEYS.currentUser);
+      state.currentUser = storedUser;
+    }
+
+    // =========================
+    // Auth Logic
+    // =========================
+    function getUsers() {
+      return load(STORAGE_KEYS.users, []);
+    }
+    function saveUsers(users) {
+      save(STORAGE_KEYS.users, users);
+    }
+
+    function signup(name, email, password) {
+      const users = getUsers();
+      if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        throw new Error("Email already registered");
+      }
+      const user = {
+        id: uid(),
+        name,
+        email,
+        password, // demo only; do not do this in production
+        address: "",
+        phone: ""
+      };
+      users.push(user);
+      saveUsers(users);
+      login(email, password);
+    }
+
+    function login(email, password) {
+      const users = getUsers();
+      const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+      if (!user) {
+        throw new Error("Invalid email or password");
+      }
+      state.currentUser = user;
+      save(STORAGE_KEYS.currentUser, user);
+      renderNav();
+      setView('home');
+    }
+
+    function logout() {
+      state.currentUser = null;
+      save(STORAGE_KEYS.currentUser, null);
+      renderNav();
+      setView('home');
+    }
+
+    function updateProfile(updates) {
+      if (!state.currentUser) return;
+      const users = getUsers();
+      const idx = users.findIndex(u => u.id === state.currentUser.id);
+      if (idx === -1) return;
+      users[idx] = { ...users[idx], ...updates };
+      state.currentUser = users[idx];
+      saveUsers(users);
+      save(STORAGE_KEYS.currentUser, state.currentUser);
+    }
+
+    // =========================
+    // Cart Logic
+    // =========================
+    function addToCart(restaurantId, item) {
+      // Optional: restrict to one restaurant per order
+      const existing = state.cart.find(c => c.restaurantId !== restaurantId);
+      if (existing && existing.restaurantId !== restaurantId) {
+        if (!confirm("Your cart has items from another restaurant. Clear cart and add this item?")) {
+          return;
+        }
+        state.cart = [];
+      }
+      const line = state.cart.find(c => c.itemId === item.id && c.restaurantId === restaurantId);
+      if (line) {
+        line.qty += 1;
+      } else {
+        state.cart.push({
+          id: uid(),
+          restaurantId,
+          itemId: item.id,
+          name: item.name,
+          price: item.price,
+          qty: 1
+        });
+      }
+      save(STORAGE_KEYS.cart, state.cart);
+      renderCartBar();
+    }
+
+    function updateCartQty(id, delta) {
+      const line = state.cart.find(c => c.id === id);
+      if (!line) return;
+      line.qty += delta;
+      if (line.qty <= 0) {
+        state.cart = state.cart.filter(c => c.id !== id);
+      }
+      save(STORAGE_KEYS.cart, state.cart);
+      renderCartBar();
+      if (state.view === 'cart') render();
+    }
+
+    function clearCart() {
+      state.cart = [];
+      save(STORAGE_KEYS.cart, state.cart);
+      renderCartBar();
+    }
+
+    function cartTotal() {
+      return state.cart.reduce((sum, c) => sum + c.price * c.qty, 0);
+    }
+
+    // =========================
+    // Orders & Tracking
+    // =========================
+    function placeOrder(checkoutData) {
+      if (!state.currentUser) throw new Error("Not logged in");
+      if (state.cart.length === 0) throw new Error("Cart is empty");
+
+      const restaurantId = state.cart[0].restaurantId;
+      const restaurant = state.restaurants.find(r => r.id === restaurantId);
+
+      const order = {
+        id: uid(),
+        userId: state.currentUser.id,
+        restaurantId,
+        restaurantName: restaurant?.name || "Unknown",
+        items: state.cart.map(c => ({ ...c })),
+        total: cartTotal(),
+        status: "Processing",
+        paymentMethod: checkoutData.paymentMethod, // "COD" or "ONLINE"
+        address: checkoutData.address,
+        phone: checkoutData.phone,
+        createdAt: Date.now(),
+        etaMinutes: 30,
+        timeline: [
+          { status: "Processing", time: Date.now() }
+        ]
+      };
+
+      const orders = load(STORAGE_KEYS.orders, []);
+      orders.unshift(order);
+      save(STORAGE_KEYS.orders, orders);
+      state.orders = orders;
+
+      clearCart();
+
+      // Simulate real-time tracking
+      simulateOrderProgress(order.id);
+
+      return order;
+    }
+
+    function simulateOrderProgress(orderId) {
+      const steps = [
+        { status: "Preparing", delay: 3000 },
+        { status: "On the Way", delay: 6000 },
+        { status: "Delivered", delay: 8000 }
+      ];
+
+      let currentStep = 0;
+
+      const interval = setInterval(() => {
+        const orders = load(STORAGE_KEYS.orders, []);
+        const idx = orders.findIndex(o => o.id === orderId);
+        if (idx === -1) {
+          clearInterval(interval);
+          return;
+        }
+        const order = orders[idx];
+
+        if (order.status === "Delivered") {
+          clearInterval(interval);
+          return;
+        }
+
+        const step = steps[currentStep];
+        if (!step) {
+          clearInterval(interval);
+          return;
+        }
+
+        order.status = step.status;
+        order.timeline.push({ status: step.status, time: Date.now() });
+        orders[idx] = order;
+        save(STORAGE_KEYS.orders, orders);
+        state.orders = orders;
+
+        if (state.view === 'orderDetail' && $('#orderDetailContainer')) {
+          renderOrderDetail(orderId);
+        }
+        if (state.view === 'orders' && $('#ordersList')) {
+          renderOrdersList();
+        }
+
+        currentStep++;
+        if (currentStep >= steps.length) {
+          clearInterval(interval);
+        }
+      }, 4000);
+    }
+
+    // =========================
+    // Rendering
+    // =========================
+    function renderNav() {
+      const nav = $('#navAuth');
+      if (state.currentUser) {
+        nav.innerHTML = `
+          <button onclick="setView('home')">Home</button>
+          <button onclick="setView('restaurants')">Restaurants</button>
+          <button onclick="setView('orders')">My Orders</button>
+          <button onclick="setView('profile')">Profile</button>
+          <button onclick="logout()">Logout</button>
+        `;
+      } else {
+        nav.innerHTML = `
+          <button onclick="setView('home')">Home</button>
+          <button onclick="setView('restaurants')">Restaurants</button>
+          <button onclick="setView('auth')">Login / Sign Up</button>
+        `;
+      }
+    }
+
+    function renderCartBar() {
+      const bar = $('#cartBar');
+      const info = $('#cartInfo');
+      if (state.cart.length === 0) {
+        bar.classList.add('hidden');
+        return;
+      }
+      bar.classList.remove('hidden');
+      const total = cartTotal();
+      const itemsCount = state.cart.reduce((s, c) => s + c.qty, 0);
+      info.textContent = `Cart: ${itemsCount} items – ${formatPrice(total)}`;
+    }
+
+    function render() {
+      const app = $('#app');
+      app.innerHTML = "";
+
+      switch (state.view) {
+        case 'home':
+          renderHome(app);
+          break;
+        case 'auth':
+          renderAuth(app);
+          break;
+        case 'restaurants':
+          renderRestaurants(app);
+          break;
+        case 'restaurantDetail':
+          renderRestaurantDetail(app);
+          break;
+        case 'cart':
+          renderCart(app);
+          break;
+        case 'checkout':
+          renderCheckout(app);
+          break;
+        case 'profile':
+          renderProfile(app);
+          break;
+        case 'orders':
+          renderOrders(app);
+          break;
+        case 'orderDetail':
+          renderOrderDetailPage(app);
+          break;
+        default:
+          renderHome(app);
+      }
+
+      renderCartBar();
+    }
+
+    // ----- Home -----
+    function renderHome(container) {
+      const featured = state.restaurants.slice(0, 4);
+      const trending = state.restaurants
+        .flatMap(r => (state.menus[r.id] || []).map(i => ({ ...i, restaurant: r })))
+        .sort((a, b) => b.price - a.price)
+        .slice(0, 4);
+
+      container.innerHTML = `
+        <div class="section">
+          <div class="offer-banner">
+            🎉 New user? Get 20% off on your first order! Use code: WELCOME20
+          </div>
+          <h2>Featured Restaurants</h2>
+          <div class="grid" id="featuredRestaurants"></div>
+        </div>
+
+        <div class="section">
+          <h2>Trending Dishes</h2>
+          <div class="grid" id="trendingDishes"></div>
+        </div>
+      `;
+
+      const featGrid = $('#featuredRestaurants');
+      featured.forEach(r => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="${r.image}" alt="${r.name}" />
+          <div class="card-body">
+            <div class="card-title">${r.name}</div>
+            <div class="card-sub">${r.cuisine} • ${r.location}</div>
+            <div class="card-sub">⭐ ${r.rating} • ${r.deliveryTime}</div>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-rid="${r.id}">View Menu</button>
+            </div>
+          </div>
+        `;
+        card.querySelector('button').onclick = () => {
+          state.currentRestaurantId = r.id;
+          setView('restaurantDetail');
+        };
+        featGrid.appendChild(card);
+      });
+
+      const trendGrid = $('#trendingDishes');
+      trending.forEach(d => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="https://picsum.photos/seed/${encodeURIComponent(d.name)}/400/200" alt="${d.name}" />
+          <div class="card-body">
+            <div class="card-title">${d.name}</div>
+            <div class="card-sub">${d.restaurant.name} • ${d.restaurant.cuisine}</div>
+            <div class="card-sub">${formatPrice(d.price)}</div>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-rid="${d.restaurant.id}" data-itemid="${d.id}">Add to Cart</button>
+            </div>
+          </div>
+        `;
+        const btn = card.querySelector('button');
+        btn.onclick = () => {
+          const item = (state.menus[d.restaurant.id] || []).find(i => i.id === d.id);
+          if (item) addToCart(d.restaurant.id, item);
+        };
+        trendGrid.appendChild(card);
+      });
+    }
+
+    // ----- Auth -----
+    function renderAuth(container) {
+      container.innerHTML = `
+        <div class="section">
+          <h2>Login or Sign Up</h2>
+          <div class="row">
+            <div class="col">
+              <h3>Login</h3>
+              <form id="loginForm">
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="loginEmail" required />
+                </div>
+                <div class="form-group">
+                  <label>Password</label>
+                  <input type="password" id="loginPass" required />
+                </div>
+                <button class="btn btn-primary" type="submit">Login</button>
+              </form>
+            </div>
+            <div class="col">
+              <h3>Sign Up</h3>
+              <form id="signupForm">
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" id="signupName" required />
+                </div>
+                <div class="form-group">
+                  <label>Email</label>
+                  <input type="email" id="signupEmail" required />
+                </div>
+                <div class="form-group">
+                  <label>Password</label>
+                  <input type="password" id="signupPass" required />
+                </div>
+                <button class="btn btn-primary" type="submit">Sign Up</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      `;
+
+      $('#loginForm').onsubmit = (e) => {
+        e.preventDefault();
+        const email = $('#loginEmail').value.trim();
+        const pass = $('#loginPass').value;
+        try {
+          login(email, pass);
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+
+      $('#signupForm').onsubmit = (e) => {
+        e.preventDefault();
+        const name = $('#signupName').value.trim();
+        const email = $('#signupEmail').value.trim();
+        const pass = $('#signupPass').value;
+        try {
+          signup(name, email, pass);
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+    }
+
+    // ----- Restaurants List -----
+    function renderRestaurants(container) {
+      container.innerHTML = `
+        <div class="section">
+          <h2>Browse Restaurants</h2>
+          <div class="filters" id="filters"></div>
+          <div class="grid" id="restaurantsGrid"></div>
+        </div>
+      `;
+
+      const filters = $('#filters');
+      filters.innerHTML = `
+        <select id="filterCuisine">
+          <option value="">All Cuisines</option>
+          ${[...new Set(state.restaurants.map(r => r.cuisine))].map(c => `<option value="${c}">${c}</option>`).join('')}
+        </select>
+        <select id="filterRating">
+          <option value="">Any Rating</option>
+          <option value="4.5">4.5+ ⭐</option>
+          <option value="4.0">4.0+ ⭐</option>
+          <option value="3.5">3.5+ ⭐</option>
+        </select>
+        <input type="text" id="filterLocation" placeholder="Search location..." />
+      `;
+
+      const grid = $('#restaurantsGrid');
+
+      function applyFilters() {
+        const cuisine = $('#filterCuisine').value;
+        const rating = $('#filterRating').value;
+        const location = $('#filterLocation').value.toLowerCase();
+
+        let list = state.restaurants.filter(r => {
+          if (cuisine && r.cuisine !== cuisine) return false;
+          if (rating && r.rating < parseFloat(rating)) return false;
+          if (location && !r.location.toLowerCase().includes(location)) return false;
+          return true;
+        });
+
+        grid.innerHTML = "";
+        if (list.length === 0) {
+          grid.innerHTML = `<div class="section">No restaurants match your filters.</div>`;
+          return;
+        }
+
+        list.forEach(r => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          card.innerHTML = `
+            <img src="${r.image}" alt="${r.name}" />
+            <div class="card-body">
+              <div class="card-title">${r.name}</div>
+              <div class="card-sub">${r.cuisine} • ${r.location}</div>
+              <div class="card-sub">⭐ ${r.rating} • ${r.deliveryTime}</div>
+              <div class="card-actions">
+                <button class="btn btn-primary" data-rid="${r.id}">View Menu</button>
+              </div>
+            </div>
+          `;
+          card.querySelector('button').onclick = () => {
+            state.currentRestaurantId = r.id;
+            setView('restaurantDetail');
+          };
+          grid.appendChild(card);
+        });
+      }
+
+      $('#filterCuisine').onchange = applyFilters;
+      $('#filterRating').onchange = applyFilters;
+      $('#filterLocation').oninput = applyFilters;
+
+      applyFilters();
+    }
+
+    // ----- Restaurant Detail & Menu -----
+    function renderRestaurantDetail(container) {
+      const rId = state.currentRestaurantId;
+      const restaurant = state.restaurants.find(r => r.id === rId);
+      if (!restaurant) {
+        setView('restaurants');
+        return;
+      }
+      const items = state.menus[rId] || [];
+
+      container.innerHTML = `
+        <div class="section">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <img src="${restaurant.image}" alt="${restaurant.name}" style="width:120px;height:80px;object-fit:cover;border-radius:8px;" />
+            <div>
+              <h2 style="margin:0;">${restaurant.name}</h2>
+              <div class="card-sub">${restaurant.cuisine} • ${restaurant.location}</div>
+              <div class="card-sub">⭐ ${restaurant.rating} • ${restaurant.deliveryTime}</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Menu</h3>
+          <div class="grid" id="menuGrid"></div>
+        </div>
+      `;
+
+      const grid = $('#menuGrid');
+      items.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+          <img src="https://picsum.photos/seed/${encodeURIComponent(item.name)}/400/200" alt="${item.name}" />
+          <div class="card-body">
+            <div class="card-title">${item.name}</div>
+            <div class="card-sub">${item.desc}</div>
+            <div class="card-sub">${formatPrice(item.price)}</div>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-itemid="${item.id}">Add to Cart</button>
+            </div>
+          </div>
+        `;
+        card.querySelector('button').onclick = () => addToCart(rId, item);
+        grid.appendChild(card);
+      });
+    }
+
+    // ----- Cart -----
+    function renderCart(container) {
+      if (state.cart.length === 0) {
+        container.innerHTML = `
+          <div class="section">
+            <h2>Your Cart</h2>
+            <p>Your cart is empty.</p>
+            <button class="btn btn-primary" onclick="setView('restaurants')">Browse Restaurants</button>
+          </div>
+        `;
+        return;
+      }
+
+      const restaurantId = state.cart[0].restaurantId;
+      const restaurant = state.restaurants.find(r => r.id === restaurantId);
+
+      container.innerHTML = `
+        <div class="section">
+          <h2>Your Cart</h2>
+          <div class="card-sub" style="margin-bottom:10px;">
+            Restaurant: <strong>${restaurant?.name || "Unknown"}</strong>
+          </div>
+          <div id="cartItems"></div>
+          <div style="margin-top:12px;text-align:right;">
+            <strong>Total: ${formatPrice(cartTotal())}</strong>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+            <button class="btn btn-outline" onclick="setView('restaurants')">Add More</button>
+            <button class="btn btn-primary" onclick="setView('checkout')">Proceed to Checkout</button>
+          </div>
+        </div>
+      `;
+
+      const itemsContainer = $('#cartItems');
+      state.cart.forEach(line => {
+        const row = document.createElement('div');
+        row.style.cssText = "display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #eee;";
+        row.innerHTML = `
+          <div>
+            <div style="font-weight:600;">${line.name}</div>
+            <div class="card-sub">${formatPrice(line.price)} × ${line.qty}</div>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center;">
+            <button class="btn btn-outline" data-delta="-1" data-id="${line.id}">−</button>
+            <span>${line.qty}</span>
+            <button class="btn btn-outline" data-delta="1" data-id="${line.id}">+</button>
+          </div>
+        `;
+        row.querySelector('[data-delta="-1"]').onclick = () => updateCartQty(line.id, -1);
+        row.querySelector('[data-delta="1"]').onclick = () => updateCartQty(line.id, 1);
+        itemsContainer.appendChild(row);
+      });
+    }
+
+    // ----- Checkout -----
+    function renderCheckout(container) {
+      if (!ensureAuth()) return;
+      if (state.cart.length === 0) {
+        setView('cart');
+        return;
+      }
+
+      const user = state.currentUser;
+      container.innerHTML = `
+        <div class="section">
+          <h2>Checkout</h2>
+          <form id="checkoutForm">
+            <div class="form-group">
+              <label>Full Name</label>
+              <input type="text" id="coName" value="${user.name || ''}" required />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="coPhone" value="${user.phone || ''}" required />
+            </div>
+            <div class="form-group">
+              <label>Delivery Address</label>
+              <textarea id="coAddress" rows="3" required>${user.address || ''}</textarea>
+            </div>
+            <div class="form-group">
+              <label>Payment Method</label>
+              <select id="coPayment">
+                <option value="COD">Cash on Delivery (COD)</option>
+                <option value="ONLINE">Dummy Online Payment</option>
+              </select>
+            </div>
+            <div class="section" style="background:#fafafa;">
+              <h3>Order Summary</h3>
+              <div id="orderSummary"></div>
+              <div style="margin-top:8px;text-align:right;">
+                <strong>Total: ${formatPrice(cartTotal())}</strong>
+              </div>
+            </div>
+            <div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;">
+              <button type="button" class="btn btn-outline" onclick="setView('cart')">Back to Cart</button>
+              <button type="submit" class="btn btn-primary">Place Order</button>
+            </div>
+          </form>
+        </div>
+      `;
+
+      const summary = $('#orderSummary');
+      state.cart.forEach(line => {
+        const row = document.createElement('div');
+        row.style.cssText = "display:flex;justify-content:space-between;padding:4px 0;";
+        row.innerHTML = `
+          <span>${line.name} × ${line.qty}</span>
+          <span>${formatPrice(line.price * line.qty)}</span>
+        `;
+        summary.appendChild(row);
+      });
+
+      $('#checkoutForm').onsubmit = (e) => {
+        e.preventDefault();
+        const name = $('#coName').value.trim();
+        const phone = $('#coPhone').value.trim();
+        const address = $('#coAddress').value.trim();
+        const paymentMethod = $('#coPayment').value;
+
+        if (!name || !phone || !address) {
+          alert("Please fill all fields");
+          return;
+        }
+
+        updateProfile({ name, phone, address });
+
+        try {
+          const order = placeOrder({ paymentMethod, address, phone });
+          alert("Order placed successfully!");
+          state.currentOrderId = order.id;
+          setView('orderDetail');
+        } catch (err) {
+          alert(err.message);
+        }
+      };
+    }
+
+    // ----- Profile -----
+    function renderProfile(container) {
+      if (!ensureAuth()) return;
+      const user = state.currentUser;
+
+      container.innerHTML = `
+        <div class="section">
+          <h2>Your Profile</h2>
+          <form id="profileForm">
+            <div class="form-group">
+              <label>Name</label>
+              <input type="text" id="profName" value="${user.name || ''}" required />
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" value="${user.email || ''}" disabled />
+            </div>
+            <div class="form-group">
+              <label>Phone</label>
+              <input type="tel" id="profPhone" value="${user.phone || ''}" required />
+            </div>
+            <div class="form-group">
+              <label>Address</label>
+              <textarea id="profAddress" rows="3" required>${user.address || ''}</textarea>
+            </div>
+            <button class="btn btn-primary" type="submit">Save Changes</button>
+          </form>
+        </div>
+      `;
+
+      $('#profileForm').onsubmit = (e) => {
+        e.preventDefault();
+        const name = $('#profName').value.trim();
+        const phone = $('#profPhone').value.trim();
+        const address = $('#profAddress').value.trim();
+        updateProfile({ name, phone, address });
+        alert("Profile updated");
+      };
+    }
+
+    // ----- Orders List -----
+    function renderOrders(container) {
+      if (!ensureAuth()) return;
+
+      container.innerHTML = `
+        <div class="section">
+          <h2>My Orders</h2>
+          <div id="ordersList"></div>
+        </div>
+      `;
+
+      renderOrdersList();
+    }
+
+    function renderOrdersList() {
+      const listContainer = $('#ordersList');
+      if (!listContainer) return;
+
+      const userOrders = state.orders.filter(o => o.userId === state.currentUser?.id);
+      if (userOrders.length === 0) {
+        listContainer.innerHTML = `<p>You have no orders yet.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = "";
+      userOrders.forEach(o => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.marginBottom = "10px";
+        const statusClass =
+          o.status === "Delivered" ? "badge-success" :
+          o.status === "On the Way" ? "badge-warning" : "badge";
+
+        card.innerHTML = `
+          <div class="card-body">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+              <div>
+                <div class="card-title">Order #${o.id.slice(0,6)}</div>
+                <div class="card-sub">${o.restaurantName} • ${new Date(o.createdAt).toLocaleString()}</div>
+              </div>
+              <div>
+                <span class="badge ${statusClass}">${o.status}</span>
+              </div>
+            </div>
+            <div class="card-sub" style="margin-top:6px;">
+              ${o.items.length} items • ${formatPrice(o.total)} • ${o.paymentMethod}
+            </div>
+            <div class="card-actions">
+              <button class="btn btn-primary" data-oid="${o.id}">Track Order</button>
+            </div>
+          </div>
+        `;
+        card.querySelector('button').onclick = () => {
+          state.currentOrderId = o.id;
+          setView('orderDetail');
+        };
+        listContainer.appendChild(card);
+      });
+    }
+
+    // ----- Order Detail & Tracking -----
+    function renderOrderDetailPage(container) {
+      if (!ensureAuth()) return;
+      const oId = state.currentOrderId;
+      const order = state.orders.find(o => o.id === oId && o.userId === state.currentUser?.id);
+      if (!order) {
+        setView('orders');
+        return;
+      }
+
+      container.innerHTML = `
+        <div class="section">
+          <h2>Order #${oId.slice(0,6)}</h2>
+          <div id="orderDetailContainer"></div>
+        </div>
+      `;
+
+      renderOrderDetail(oId);
+    }
+
+    function renderOrderDetail(orderId) {
+      const container = $('#orderDetailContainer');
+      if (!container) return;
+
+      const order = state.orders.find(o => o.id === orderId);
+      if (!order) return;
+
+      const statusClass =
+        order.status === "Delivered" ? "badge-success" :
+        order.status === "On the Way" ? "badge-warning" : "badge";
+
+      const steps = ["Processing", "Preparing", "On the Way", "Delivered"];
+      const currentIndex = steps.indexOf(order.status);
+
+      let timelineHtml = "";
+      order.timeline.forEach((t, i) => {
+        timelineHtml += `
+          <div class="step ${i <= currentIndex ? 'active' : ''}">
+            ${t.status} • ${new Date(t.time).toLocaleTimeString()}
+          </div>
+        `;
+      });
+
+      container.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+          <div>
+            <div class="card-title">${order.restaurantName}</div>
+            <div class="card-sub">${new Date(order.createdAt).toLocaleString()}</div>
+          </div>
+          <div>
+            <span class="badge ${statusClass}">${order.status}</span>
+          </div>
+        </div>
+
+        <div class="section" style="background:#fafafa;">
+          <h3>Order Timeline</h3>
+          <div class="order-timeline">
+            ${timelineHtml}
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Items</h3>
+          <div id="orderItems"></div>
+          <div style="margin-top:8px;text-align:right;">
+            <strong>Total: ${formatPrice(order.total)}</strong>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Delivery Details</h3>
+          <div class="card-sub"><strong>Address:</strong> ${order.address}</div>
+          <div class="card-sub"><strong>Phone:</strong> ${order.phone}</div>
+          <div class="card-sub"><strong>Payment:</strong> ${order.paymentMethod}</div>
+        </div>
+      `;
+
+      const itemsContainer = $('#orderItems');
+      order.items.forEach(line => {
+        const row = document.createElement('div');
+        row.style.cssText = "display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #eee;";
+        row.innerHTML = `
+          <span>${line.name} × ${line.qty}</span>
+          <span>${formatPrice(line.price * line.qty)}</span>
+        `;
+        itemsContainer.appendChild(row);
+      });
+    }
+
+    // ----- Event Wiring for Cart Bar -----
+    $('#btnViewCart').onclick = () => setView('cart');
+    $('#btnCheckout').onclick = () => setView('checkout');
+
+    // =========================
+    // Init
+    // =========================
+    seedData();
+    renderNav();
+    render();
+  </script>
+</body>
+</html>
